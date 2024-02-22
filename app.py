@@ -1,6 +1,7 @@
 import streamlit as st
 from transformers import pipeline
 import huggingface_hub
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 # GUI
 st.title("💬 Chatbot Demo")
@@ -18,7 +19,8 @@ with st.sidebar:
     ''')
 
 def load_model():
-    model = huggingface_hub(repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1", model_kwargs={"temperature":0.25})
+    tokenizer = AutoTokenizer.from_pretrained("mistralai/Mixtral-8x7B-Instruct-v0.1")
+    model = AutoModelForCausalLM.from_pretrained("mistralai/Mixtral-8x7B-Instruct-v0.1")
     #model = pipeline("text-generation", model="mistralai/Mixtral-8x7B-Instruct-v0.1")
     st.success("Model loaded")
     return model
