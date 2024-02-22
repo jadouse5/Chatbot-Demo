@@ -2,6 +2,7 @@ import streamlit as st
 from transformers import pipeline
 import huggingface_hub
 from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
 
 # GUI
 st.title("💬 Chatbot Demo")
