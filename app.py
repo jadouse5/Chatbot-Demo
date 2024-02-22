@@ -41,6 +41,7 @@ def display_response(response):
 
 def clear_chat_history():
     st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+
 st.sidebar.button('Clear History', on_click=clear_chat_history)
 
 
@@ -51,7 +52,7 @@ def main():
         st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
 
     # Display chat messages from history on app rerun
-    for message in st.session_state.messages:
+    for message in st.session_state.messages():
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
