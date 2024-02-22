@@ -50,7 +50,7 @@ st.sidebar.button('Clear History', on_click=clear_chat_history)
 def main():
 
     # Initialize chat history
-     if "messages" not in st.session_state:
+    if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
 
     # Display chat messages from history on app rerun
