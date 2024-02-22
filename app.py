@@ -1,5 +1,4 @@
 import streamlit as st
-import huggingface_hub
 from transformers import pipeline
 
 # GUI
@@ -22,19 +21,19 @@ def load_model():
     st.success("Model loaded")
     return model
 
+model = load_model()
+
 # Function Definitions
 def get_input():
     input = st.chat_input("What's on your mind")
     return input
 
 def generate_response(prompt):
-
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    response = model(prompt)
-    return response
+    if prompt:  # Ensure there's a prompt to avoid generating from an empty string
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        response = model(prompt, max_length=50)[0]['generated_text']
+        return response
+    return ""
 
 def display_response(response):
     with st.chat_message("assistant"):
@@ -46,12 +45,10 @@ st.sidebar.button('Clear History', on_click=clear_chat_history)
 
 
 def main():
-    
-    load_model()
-    
+
     # Initialize chat history
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+     if "messages" not in st.session_state:
+        st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
 
     # Display chat messages from history on app rerun
     for message in st.session_state.messages:
@@ -59,13 +56,14 @@ def main():
             st.markdown(message["content"])
 
     prompt = get_input()
-    with st.spinner("Thinking..."):
-        response = generate_response(prompt)
-    display_response(response)
+    if prompt:
+        with st.spinner("Thinking..."):
+            response = generate_response(prompt)
+            display_response(response)
 
         # Add assistant response to chat history
     st.session_state.messages.append({"role": "user", "content": response})
 
 
-
-main()
+if __name__ == "__main__":
+    main()
