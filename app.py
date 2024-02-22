@@ -1,5 +1,7 @@
 import streamlit as st
 from transformers import pipeline
+import torch
+import HuggingFaceHub
 
 # GUI
 st.title("💬 Chatbot Demo")
@@ -17,7 +19,8 @@ with st.sidebar:
     ''')
 
 def load_model():
-    model = pipeline("text-generation", model="mistralai/Mixtral-8x7B-Instruct-v0.1")
+    model = HuggingFaceHub(repo_id="mistralai/Mixtral-8x7B-Instruct-v0.1", model_kwargs={"temperature":0.25})
+    #model = pipeline("text-generation", model="mistralai/Mixtral-8x7B-Instruct-v0.1")
     st.success("Model loaded")
     return model
 
@@ -41,23 +44,21 @@ def display_response(response):
 
 def clear_chat_history():
     st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
-
 st.sidebar.button('Clear History', on_click=clear_chat_history)
 
 
 def main():
 
     # Initialize chat history
-    if "messages" not in st.session_state:
+     if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
 
     # Display chat messages from history on app rerun
-    for message in st.session_state.messages():
+    for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
     prompt = get_input()
-    
     if prompt:
         with st.spinner("Thinking..."):
             response = generate_response(prompt)
