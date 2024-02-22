@@ -1,9 +1,12 @@
 import streamlit as st
+import huggingface_hub
+from transformers import pipeline
 
-st.title("Chatbot Demo")
+# GUI
+st.title("💬 Chatbot Demo")
 
 with st.sidebar:
-    st.title("Chatbot Demo")
+    st.title("💬 Chatbot Demo")
     st.markdown('''
     Author: Jad Tounsi El Azzoiani
     Date: 21/02/2024
@@ -14,47 +17,55 @@ with st.sidebar:
     
     ''')
 
+def load_model():
+    model = pipeline("text-generation", model="mistralai/Mixtral-8x7B-Instruct-v0.1")
+    st.success("Model loaded")
+    return model
 
 # Function Definitions
+def get_input():
+    input = st.chat_input("What's on your mind")
+    return input
 
-'''def generate_response(prompt):
-    bot = hugchat.ChatBot()
-    response = chatbot.chat(prompt)
-    return response'''
+def generate_response(prompt):
 
-
-
-# Setting up chat UI
-with st.chat_message("user"):
-    st.write("Hello human👋") 
-    st.write("What can I do for you today?")
-
-prompt = st.chat_input("Say something")
-
-if prompt:
-    st.write(f"User: {prompt}")
-
-# Initialise chat history
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# Display chat messages
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-# User input
-
-if prompt := st.chat_input("Message chatbot"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
+
+    response = model(prompt)
+    return response
+
+def display_response(response):
+    with st.chat_message("assistant"):
+       st.write(f"Chatbot: {response}")
+
+def clear_chat_history():
+    st.session_state.messages = [{"role": "assistant", "content": "How may I assist you today?"}]
+st.sidebar.button('Clear History', on_click=clear_chat_history)
+
+
+def main():
     
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    load_model()
+    
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
 
-response = f"Chatbot: {prompt}"
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
-with st.chat_messages("assistant"):
-    st.markdown(response)
+    prompt = get_input()
+    with st.spinner("Thinking..."):
+        response = generate_response(prompt)
+    display_response(response)
 
-st.session_state.messages.append({"role": "user", "content": response})
+        # Add assistant response to chat history
+    st.session_state.messages.append({"role": "user", "content": response})
+
+
+
+main()
