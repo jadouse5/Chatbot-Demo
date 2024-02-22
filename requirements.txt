@@ -2,3 +2,6 @@ streamlit
 huggingface-hub
 transformers
 tensorflow
+torch 
+torchvision 
+torchaudio
